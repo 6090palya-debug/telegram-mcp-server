@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from pydantic import BaseModel
+from typing import Any  # ← ДОБАВЛЕНО
 import requests
 import os
 
@@ -8,7 +9,6 @@ app = FastAPI(
     description="MCP-compatible server that sends images to your Telegram chat."
 )
 
-# Получаем секреты из переменных окружения
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
@@ -16,7 +16,7 @@ class MCPRequest(BaseModel):
     jsonrpc: str = "2.0"
     method: str
     params: dict
-    id: Any
+    id: Any  # ← Теперь работает
 
 @app.get("/")
 def root():
@@ -36,8 +36,8 @@ async def mcp_endpoint(req: MCPRequest):
                         "inputSchema": {
                             "type": "object",
                             "properties": {
-                                "imageUrl": {"type": "string", "description": "Public URL of the image"},
-                                "caption": {"type": "string", "description": "Optional caption"}
+                                "imageUrl": {"type": "string"},
+                                "caption": {"type": "string"}
                             },
                             "required": ["imageUrl"]
                         }
@@ -60,14 +60,14 @@ async def mcp_endpoint(req: MCPRequest):
                         "error": {"code": -32000, "message": "Missing required parameters or env vars"}
                     }
 
-                # Отправка в Telegram
+                # ИСПРАВЛЕНО: убраны пробелы в URL
                 resp = requests.post(
                     f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto",
                     data={"chat_id": CHAT_ID, "photo": image_url, "caption": caption[:1024]},
                     timeout=10
                 )
 
-                message = "✅ Image sent to Telegram!" if resp.status_code == 200 else "❌ Failed to send"
+                message = "✅ Image sent to Telegram!" if resp.status_code == 200 else f"❌ Failed: {resp.text}"
                 return {
                     "jsonrpc": "2.0",
                     "id": req.id,
