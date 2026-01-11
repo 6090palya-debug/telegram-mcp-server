@@ -16,7 +16,7 @@ class MCPRequest(BaseModel):
     jsonrpc: str = "2.0"
     method: str
     params: dict
-    id: str
+    id: Any
 
 @app.get("/")
 def root():
