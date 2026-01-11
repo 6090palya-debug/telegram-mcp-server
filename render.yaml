@@ -1,3 +1,15 @@
-fastapi==0.115.0
-uvicorn[standard]==0.32.0
-requests==2.32.3
+version: 1
+services:
+  - type: web
+    name: telegram-mcp-server
+    runtime: python
+    env: python
+    region: frankfurt # или ваш регион
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
