@@ -10,8 +10,8 @@ app = FastAPI(
 )
 
 # Загружаем секреты из переменных окружения
-BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+BOT_TOKEN = os.getenv("8020544313:AAHMouxthG0KboKYlIZl6a1AYjbNxWFe9EI")
+CHAT_ID = os.getenv("24237780")
 
 class MCPRequest(BaseModel):
     jsonrpc: str = "2.0"
